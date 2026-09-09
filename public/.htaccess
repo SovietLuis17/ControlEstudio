@@ -1,0 +1,16 @@
+# public/.htaccess
+# Reescribe todas las peticiones a index.php para usar URLs amigables
+# Mantiene archivos y carpetas reales intactos
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Si la peticion no es un archivo existente
+    RewriteCond %{REQUEST_FILENAME} !-f
+
+    # Si la peticion no es una carpeta existente
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Reescribe todo hacia index.php manteniendo query string
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
