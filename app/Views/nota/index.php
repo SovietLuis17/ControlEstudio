@@ -18,6 +18,9 @@ require __DIR__ . '/../partials/header.php';
                 <a href="<?= BASE_URL ?>dashboard/index" class="btn btn-outline-light btn-sm me-2">
                     Dashboard
                 </a>
+                <a href="<?= BASE_URL ?>reporte/index" class="btn btn-outline-light btn-sm me-2">
+                    Reportes
+                </a>
                 <a href="<?= BASE_URL ?>auth/logout" class="btn btn-outline-light btn-sm">
                     Cerrar sesion
                 </a>
@@ -63,10 +66,21 @@ require __DIR__ . '/../partials/header.php';
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="mb-0">Resumen de Notas</h4>
-            <!-- Boton para ir a los estudiantes de la seccion -->
+                        <!-- Boton para ir a los estudiantes de la seccion -->
             <a href="<?= BASE_URL ?>seccion/estudiantes/<?= $seccion['id'] ?>"
                class="btn btn-outline-primary btn-sm">
                 Ver Estudiantes
+            </a>
+            <!-- Atajos de descarga de reportes de notas -->
+            <a href="<?= BASE_URL ?>reporte/notasPdf/<?= $seccion['id'] ?>"
+               target="_blank"
+               class="btn btn-outline-danger btn-sm">
+                Notas PDF
+            </a>
+            <a href="<?= BASE_URL ?>reporte/notasExcel/<?= $seccion['id'] ?>"
+               target="_blank"
+               class="btn btn-outline-success btn-sm">
+                Notas Excel
             </a>
         </div>
 

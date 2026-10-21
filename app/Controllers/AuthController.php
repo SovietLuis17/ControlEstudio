@@ -26,7 +26,6 @@ class AuthController
     }
 
     // Procesa el formulario de login (envio tradicional, no AJAX)
-    // Procesa el formulario de login (envio tradicional, no AJAX)
     public function authenticate(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -104,7 +103,6 @@ class AuthController
     }
 
     // Procesa el registro de un nuevo profesor
-    // Procesa el registro de un nuevo profesor
     public function processRegister(): void
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -131,20 +129,13 @@ class AuthController
         $errores = [];
 
         // Validar campos obligatorios
-        if (empty($datos['cedula']))
-            $errores[] = 'La cedula es obligatoria.';
-        if (empty($datos['nombres']))
-            $errores[] = 'Los nombres son obligatorios.';
-        if (empty($datos['apellidos']))
-            $errores[] = 'Los apellidos son obligatorios.';
-        if (empty($datos['fecha_nacimiento']))
-            $errores[] = 'La fecha de nacimiento es obligatoria.';
-        if (empty($datos['genero']))
-            $errores[] = 'El genero es obligatorio.';
-        if (empty($datos['correo']))
-            $errores[] = 'El correo es obligatorio.';
-        if (empty($datos['password']))
-            $errores[] = 'La contrasena es obligatoria.';
+        if (empty($datos['cedula'])) $errores[] = 'La cedula es obligatoria.';
+        if (empty($datos['nombres'])) $errores[] = 'Los nombres son obligatorios.';
+        if (empty($datos['apellidos'])) $errores[] = 'Los apellidos son obligatorios.';
+        if (empty($datos['fecha_nacimiento'])) $errores[] = 'La fecha de nacimiento es obligatoria.';
+        if (empty($datos['genero'])) $errores[] = 'El genero es obligatorio.';
+        if (empty($datos['correo'])) $errores[] = 'El correo es obligatorio.';
+        if (empty($datos['password'])) $errores[] = 'La contrasena es obligatoria.';
 
         // Validar que la cedula contenga solo numeros (aunque sea varchar)
         if (!empty($datos['cedula']) && !$this->validarSoloNumeros($datos['cedula'])) {
@@ -240,32 +231,45 @@ class AuthController
             exit;
         }
     }
-    // Cierra la sesion del usuario y destruye los datos
+
+    // Cierra la sesion del usuario y destruye todos los datos
+    // Ademas elimina la cookie de sesion del navegador para que
+    // no quede ningun rastro del id de sesion anterior
     public function logout(): void
     {
+        // Borramos la cookie de sesion en el cliente
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
+        }
+
+        // Vaciamos la sesion y la destruimos en el servidor
         $_SESSION = [];
         session_destroy();
+
         header('Location: ' . BASE_URL . 'auth/login');
         exit;
     }
 
-    // Valida que la contrasena cumpla con los requisitos de seguridad
-    // Minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial
-    private function validarPasswordFuerte(string $password): bool
-    {
-        $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\-\*\+#\$\&\.\,\!\?\@\%\(\)_\=\[\]\{\}\|:;]).{8,}$/';
-        return preg_match($regex, $password) === 1;
-    }
+    // ============================================================
+    // METODOS PRIVADOS DE VALIDACION FUERTE
+    // ============================================================
 
     // Valida que un texto contenga solo letras (con o sin acentos) y espacios
-    // Se usa para nombres y apellidos
     private function validarSoloLetras(string $valor): bool
     {
         return preg_match('/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/', $valor) === 1;
     }
 
     // Valida que un texto contenga solo digitos numericos
-    // Se usa para la cedula, aunque la columna sea varchar
     private function validarSoloNumeros(string $valor): bool
     {
         return preg_match('/^[0-9]+$/', $valor) === 1;
@@ -277,10 +281,17 @@ class AuthController
         return preg_match('/^[0-9\-\+\s]+$/', $valor) === 1;
     }
 
-    // Valida texto simple para especialidad
-    // Permite letras, numeros, espacios, puntos y guiones (ej: Matematicas II)
+    // Valida texto simple para especialidad: letras, numeros, espacios, puntos y guiones
     private function validarTextoSimple(string $valor): bool
     {
         return preg_match('/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\.\-]+$/', $valor) === 1;
+    }
+
+    // Valida que la contrasena cumpla con los requisitos de seguridad
+    // Minimo 8 caracteres, mayuscula, minuscula, numero y caracter especial
+    private function validarPasswordFuerte(string $password): bool
+    {
+        $regex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\-\*\+#\$\&\.\,\!\?\@\%\(\)_\=\[\]\{\}\|:;]).{8,}$/';
+        return preg_match($regex, $password) === 1;
     }
 }

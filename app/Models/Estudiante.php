@@ -388,4 +388,28 @@ class Estudiante
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
         return intval($resultado['total']);
     }
+
+        // Obtiene los inscritos de una seccion con todos sus datos
+    // Se usa exclusivamente para el reporte Excel de inscritos
+    public function obtenerInscritosPorSeccion(int $seccionId): array
+    {
+        $sql = "
+            SELECT 
+                id,
+                cedula,
+                nombres,
+                apellidos,
+                TIMESTAMPDIFF(YEAR, fecha_nacimiento, CURDATE()) as edad,
+                genero,
+                carrera,
+                correo,
+                telefono
+            FROM estudiantes
+            WHERE seccion_id = :seccion_id
+            ORDER BY apellidos ASC, nombres ASC
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':seccion_id' => $seccionId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

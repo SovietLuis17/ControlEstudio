@@ -18,6 +18,9 @@ require __DIR__ . '/../partials/header.php';
                 <a href="<?= BASE_URL ?>dashboard/index" class="btn btn-outline-light btn-sm me-2">
                     Dashboard
                 </a>
+                <a href="<?= BASE_URL ?>reporte/index" class="btn btn-outline-light btn-sm me-2">
+                    Reportes
+                </a>
                 <a href="<?= BASE_URL ?>auth/logout" class="btn btn-outline-light btn-sm">
                     Cerrar sesion
                 </a>

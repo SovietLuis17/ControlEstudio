@@ -11,10 +11,10 @@ use PDOException;
 class Database
 {
     // Atributos privados con la configuracion de conexion
-    private $host = '127.0.0.1';
-    private $db   = 'controlEstudios';
-    private $user = 'root';
-    private $pass = '';
+    private $host = '127.0.0.1'; //
+    private $db   = 'controlEstudios'; //
+    private $user = 'root'; //
+    private $pass = ''; //''
     private $charset = 'utf8mb4';
     private $pdo;
 

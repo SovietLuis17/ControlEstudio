@@ -209,7 +209,7 @@ VALUES (
     'profesor@system.com',
     '$2y$10$uLTIhb81mctTrGpyd/DGPOdSTR2KjrUrJfSJFGNPPr7g8xxKdigkq',
     'Programacion',
-    'profesor'
+    'admin'
 );
 
 -- ============================================================

@@ -274,4 +274,100 @@ class Nota
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
         return intval($resultado['total']);
     }
+
+        // Obtiene el reporte completo de notas de una seccion
+    // Devuelve cada estudiante con sus notas por actividad, nota final y estado
+    // Se usa para los reportes en PDF y Excel
+    public function obtenerReporteNotas(int $seccionId, int $materiaId): array
+    {
+        // Actividades del plan de la materia
+        $sqlActividades = "
+            SELECT id, nombre_actividad, porcentaje
+            FROM plan_evaluacion
+            WHERE materia_id = :materia_id
+            ORDER BY id ASC
+        ";
+        $stmtAct = $this->db->prepare($sqlActividades);
+        $stmtAct->execute([':materia_id' => $materiaId]);
+        $actividades = $stmtAct->fetchAll(PDO::FETCH_ASSOC);
+
+        // Estudiantes inscritos en la seccion
+        $sqlEstudiantes = "
+            SELECT id as estudiante_id, cedula, nombres, apellidos
+            FROM estudiantes
+            WHERE seccion_id = :seccion_id
+            ORDER BY apellidos ASC, nombres ASC
+        ";
+        $stmtEst = $this->db->prepare($sqlEstudiantes);
+        $stmtEst->execute([':seccion_id' => $seccionId]);
+        $estudiantes = $stmtEst->fetchAll(PDO::FETCH_ASSOC);
+
+        // Todas las notas de esa seccion en esa materia, en una sola consulta
+        $sqlNotas = "
+            SELECT n.estudiante_id, n.plan_evaluacion_id, n.nota
+            FROM notas n
+            INNER JOIN plan_evaluacion pe ON n.plan_evaluacion_id = pe.id
+            INNER JOIN estudiantes e ON n.estudiante_id = e.id
+            WHERE e.seccion_id = :seccion_id
+              AND pe.materia_id = :materia_id
+        ";
+        $stmtNotas = $this->db->prepare($sqlNotas);
+        $stmtNotas->execute([
+            ':seccion_id' => $seccionId,
+            ':materia_id' => $materiaId
+        ]);
+        $notas = $stmtNotas->fetchAll(PDO::FETCH_ASSOC);
+
+        // Armamos un mapa: estudiante -> actividad -> nota
+        $mapa = [];
+        foreach ($notas as $nota) {
+            $mapa[$nota['estudiante_id']][$nota['plan_evaluacion_id']] = $nota['nota'];
+        }
+
+        // Combinamos todo en el arreglo final del reporte
+        $reporte = [];
+        foreach ($estudiantes as $estudiante) {
+            $notasDelEstudiante = [];
+            $suma = 0;
+            $completas = 0;
+
+            foreach ($actividades as $actividad) {
+                $valor = $mapa[$estudiante['estudiante_id']][$actividad['id']] ?? null;
+                $notasDelEstudiante[$actividad['id']] = $valor;
+
+                if ($valor !== null) {
+                    $suma += floatval($valor) * floatval($actividad['porcentaje']) / 100;
+                    $completas++;
+                }
+            }
+
+            // Misma regla de coherencia del sistema:
+            // sin notas, en curso, aprobado o reprobado
+            if ($completas === 0) {
+                $estado = 'sin_notas';
+                $notaFinal = null;
+            } elseif ($completas < count($actividades)) {
+                $estado = 'en_curso';
+                $notaFinal = null;
+            } elseif (round($suma, 2) >= 13) {
+                $estado = 'aprobado';
+                $notaFinal = round($suma, 2);
+            } else {
+                $estado = 'reprobado';
+                $notaFinal = round($suma, 2);
+            }
+
+            $reporte[] = [
+                'estudiante_id' => $estudiante['estudiante_id'],
+                'cedula' => $estudiante['cedula'],
+                'nombres' => $estudiante['nombres'],
+                'apellidos' => $estudiante['apellidos'],
+                'notas' => $notasDelEstudiante,
+                'nota_final' => $notaFinal,
+                'estado' => $estado
+            ];
+        }
+
+        return $reporte;
+    }
 }

@@ -17,6 +17,9 @@ require __DIR__ . '/../partials/header.php';
                 <a href="<?= BASE_URL ?>dashboard/index" class="btn btn-outline-light btn-sm me-2">
                     Dashboard
                 </a>
+                <a href="<?= BASE_URL ?>reporte/index" class="btn btn-outline-light btn-sm me-2">
+                    Reportes
+                </a>
                 <a href="<?= BASE_URL ?>auth/logout" class="btn btn-outline-light btn-sm">
                     Cerrar sesion
                 </a>
@@ -61,9 +64,16 @@ require __DIR__ . '/../partials/header.php';
             <h4 class="mb-0">Estudiantes Inscritos</h4>
             <div>
                 <!-- Boton para ir a las notas de la seccion -->
+                               <!-- Boton para ir a las notas de la seccion -->
                 <a href="<?= BASE_URL ?>nota/index/<?= $seccion['id'] ?>"
                    class="btn btn-success btn-sm me-2">
                     Ver Notas
+                </a>
+                <!-- Atajo de descarga de inscritos en Excel -->
+                <a href="<?= BASE_URL ?>reporte/inscritosExcel/<?= $seccion['id'] ?>"
+                   target="_blank"
+                   class="btn btn-outline-success btn-sm me-2">
+                    Inscritos Excel
                 </a>
                 <!-- Boton para abrir el modal de inscripcion -->
                 <button type="button" class="btn btn-dark btn-sm" id="btnInscribirEstudiante">

@@ -2,6 +2,7 @@
 $pageTitle = 'Dashboard del Sistema';
 require __DIR__ . '/../partials/header.php';
 ?>
+
 <body class="bg-light">
 
     <!-- Barra de navegacion principal con menu segun el rol -->
@@ -53,6 +54,9 @@ require __DIR__ . '/../partials/header.php';
                         <?= htmlspecialchars($_SESSION['nombre'] ?? 'Usuario') ?>
                         <span class="badge bg-secondary"><?= htmlspecialchars($_SESSION['rol'] ?? '') ?></span>
                     </span>
+                    <a href="<?= BASE_URL ?>reporte/index" class="btn btn-outline-light btn-sm me-2">
+                        Reportes
+                    </a>
                     <a href="<?= BASE_URL ?>auth/logout" class="btn btn-outline-light btn-sm">
                         Cerrar sesion
                     </a>
@@ -277,24 +281,24 @@ require __DIR__ . '/../partials/header.php';
                                     <p class="mb-2">
                                         <strong>Avance de notas:</strong>
                                         <?= intval($seccion['avance'] ?? 0) ?>%
-                                        (<?= intval($seccion['total_notas'] ?? 0) ?> de <?= intval($seccion['total_esperado'] ?? 0) ?>)
+                                        (<?= intval($seccion['total_notas'] ?? 0) ?> de
+                                        <?= intval($seccion['total_esperado'] ?? 0) ?>)
                                     </p>
 
                                     <!-- Barra de progreso del avance de notas -->
                                     <div class="progress mb-3">
-                                        <div class="progress-bar bg-success"
-                                             style="width: <?= intval($seccion['avance'] ?? 0) ?>%">
+                                        <div class="progress-bar bg-success" style="width: <?= intval($seccion['avance'] ?? 0) ?>%">
                                         </div>
                                     </div>
 
                                     <!-- Botones de accion de la seccion -->
                                     <div class="d-flex gap-2">
                                         <a href="<?= BASE_URL ?>seccion/estudiantes/<?= $seccion['id'] ?>"
-                                           class="btn btn-outline-primary btn-sm">
+                                            class="btn btn-outline-primary btn-sm">
                                             Ver estudiantes
                                         </a>
                                         <a href="<?= BASE_URL ?>nota/index/<?= $seccion['id'] ?>"
-                                           class="btn btn-outline-success btn-sm">
+                                            class="btn btn-outline-success btn-sm">
                                             Ver notas
                                         </a>
                                     </div>
@@ -312,7 +316,7 @@ require __DIR__ . '/../partials/header.php';
     <!-- Bootstrap JS desde CDN 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 -->
-     <!-- Boostrap JS nativo-->
+    <!-- Boostrap JS nativo-->
     <script src="<?= BASE_URL ?>assets/js/bootstrap.bundle.min.js"></script>
     <!-- Script para mostrar mensajes SweetAlert guardados en sesion -->
     <script>
@@ -328,4 +332,5 @@ require __DIR__ . '/../partials/header.php';
     </script>
 
 </body>
+
 </html>

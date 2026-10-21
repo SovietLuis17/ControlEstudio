@@ -7,7 +7,7 @@
 // 1. CONFIGURACION Y SEGURIDAD DE LA SESION
 // ============================================================
 session_set_cookie_params([
-    'lifetime' => 3600,
+    'lifetime' => 0,   // Cookie de sesion pura: muere al cerrar el navegador
     'path' => '/',
     'domain' => '',
     'secure' => false,
@@ -18,6 +18,17 @@ session_set_cookie_params([
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// ============================================================
+// 1.5 PREVENCION DE CACHE EN PAGINAS DINAMICAS
+// ============================================================
+// Evita que el navegador guarde copias de las paginas del sistema
+// Con esto, el boton atras despues de cerrar sesion obliga al
+// navegador a consultar de nuevo al servidor, y el front
+// controller redirige al login porque ya no existe sesion
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: Thu, 01 Jan 1970 00:00:00 GMT');
 
 // ============================================================
 // 2. DETECCION AUTOMATICA DE BASE_URL
@@ -74,55 +85,62 @@ if ($controller === null || $action === null) {
 // ============================================================
 $rutasPermitidas = [
     'auth' => [
-        'login' => ['publico'],
-        'authenticate' => ['publico'],
-        'register' => ['publico'],
+        'login'           => ['publico'],
+        'authenticate'    => ['publico'],
+        'register'        => ['publico'],
         'processRegister' => ['publico'],
-        'logout' => ['admin', 'profesor']
+        'logout'          => ['admin', 'profesor']
     ],
     'dashboard' => [
         'index' => ['admin', 'profesor']
     ],
     'periodo' => [
-        'index' => ['admin'],
-        'guardar' => ['admin'],
+        'index'    => ['admin'],
+        'guardar'  => ['admin'],
         'eliminar' => ['admin']
     ],
     'materia' => [
-        'index' => ['admin', 'profesor'],
-        'guardar' => ['admin'],
+        'index'    => ['admin', 'profesor'],
+        'guardar'  => ['admin'],
         'eliminar' => ['admin']
     ],
     'planEvaluacion' => [
-        'index' => ['admin', 'profesor'],
-        'guardar' => ['admin', 'profesor'],
+        'index'    => ['admin', 'profesor'],
+        'guardar'  => ['admin', 'profesor'],
         'eliminar' => ['admin', 'profesor']
     ],
     'profesor' => [
-        'index' => ['admin'],
-        'guardar' => ['admin'],
+        'index'    => ['admin'],
+        'guardar'  => ['admin'],
         'eliminar' => ['admin']
     ],
     'estudiante' => [
-        'index' => ['admin', 'profesor'],
-        'guardar' => ['admin', 'profesor'],
-        'eliminar' => ['admin'],
+        'index'          => ['admin', 'profesor'],
+        'guardar'        => ['admin', 'profesor'],
+        'eliminar'       => ['admin'],
         'asignarSeccion' => ['admin', 'profesor'],
-        'quitarSeccion' => ['admin', 'profesor']
+        'quitarSeccion'  => ['admin', 'profesor']
     ],
     'seccion' => [
-        'index' => ['admin', 'profesor'],
-        'guardar' => ['admin'],
-        'eliminar' => ['admin'],
+        'index'       => ['admin', 'profesor'],
+        'guardar'     => ['admin'],
+        'eliminar'    => ['admin'],
         'estudiantes' => ['admin', 'profesor']
     ],
     'nota' => [
-        'index' => ['admin', 'profesor'],
-        'ver' => ['admin', 'profesor'],
-        'guardar' => ['admin', 'profesor'],
+        'index'    => ['admin', 'profesor'],
+        'ver'      => ['admin', 'profesor'],
+        'guardar'  => ['admin', 'profesor'],
         'eliminar' => ['admin']
+    ],
+    'reporte' => [
+        'index'          => ['admin', 'profesor'],
+        'notasPdf'       => ['admin', 'profesor'],
+        'notasExcel'     => ['admin', 'profesor'],
+        'inscritosExcel' => ['admin', 'profesor']
     ]
 ];
+
 
 if (!isset($rutasPermitidas[$controller][$action])) {
     http_response_code(404);
